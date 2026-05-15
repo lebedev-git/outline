@@ -2,37 +2,41 @@
 
 ## Source of Truth
 
-The `outline-ai-search` service is now managed as source code:
+The custom Outline services are now managed as source code:
 
-1. Edit `outline-ai-search/app.py`.
+1. Edit `outline-ai-search/app.py` or files under `outline-app/`.
 2. Commit and push to GitHub.
-3. GitHub Actions builds and publishes `ghcr.io/lebedev-git/outline-ai-search`.
-4. Portainer uses that image in the `outline-server` stack.
+3. GitHub Actions builds and publishes GHCR images.
+4. Watchtower on the Docker host pulls changed `latest` images and restarts only labeled containers.
 
 ## Image Tags
 
 The workflow publishes:
 
 - `ghcr.io/lebedev-git/outline-ai-search:latest` from `main`
-- `ghcr.io/lebedev-git/outline-ai-search:sha-<commit>` for every build
-- `ghcr.io/lebedev-git/outline-ai-search:outline-ai-search-<version>` for matching Git tags
+- `ghcr.io/lebedev-git/outline-app:latest` from `main`
+- `ghcr.io/lebedev-git/<image>:sha-<commit>` for every build
+- `ghcr.io/lebedev-git/<image>:outline-<version>` for matching Git tags
 
-For production, prefer a fixed tag such as `sha-...` or a release tag. `latest` is convenient but less strict.
+This deployment intentionally uses `latest` because Watchtower needs a moving tag for automatic updates.
 
 ## Portainer Setup
 
-In Portainer, the `ai-search` service should use the current verified release image:
+In Portainer, the custom services should use GHCR `latest` images:
 
 ```yaml
-image: ghcr.io/lebedev-git/outline-ai-search:outline-ai-search-2026-05-15-1
+outline:
+  image: ghcr.io/lebedev-git/outline-app:latest
+
+ai-search:
+  image: ghcr.io/lebedev-git/outline-ai-search:latest
 ```
 
-`latest` is acceptable for quick tests, but a release tag is safer for production because it will not change unexpectedly.
-
-Alternative pinned build format:
+Both services should have the Watchtower label:
 
 ```yaml
-image: ghcr.io/lebedev-git/outline-ai-search:sha-<commit>
+labels:
+  com.centurylinklabs.watchtower.enable: "true"
 ```
 
 Keep:
@@ -48,6 +52,25 @@ If the GitHub package is private, add GHCR credentials in Portainer:
 - Password: GitHub personal access token with `read:packages`
 
 If the package is public, credentials are not required.
+
+## Automatic Updates
+
+The stack includes Watchtower:
+
+```yaml
+watchtower:
+  image: containrrr/watchtower:latest
+  command:
+    - --label-enable
+    - --interval
+    - "300"
+    - --cleanup
+    - --rolling-restart
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+```
+
+It checks every 5 minutes. Only containers with `com.centurylinklabs.watchtower.enable=true` are updated.
 
 ## Manual Build Fallback
 

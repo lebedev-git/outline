@@ -1,5 +1,24 @@
 services:
+  outline:
+    image: ghcr.io/lebedev-git/outline-app:latest
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+
   ai-search:
-    image: ghcr.io/lebedev-git/outline-ai-search:outline-ai-search-2026-05-15-1
+    image: ghcr.io/lebedev-git/outline-ai-search:latest
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
     environment:
       FAST_INDEX_INTERVAL_SECONDS: "30"
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    command:
+      - --label-enable
+      - --interval
+      - "300"
+      - --cleanup
+      - --rolling-restart
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
