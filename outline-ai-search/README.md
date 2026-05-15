@@ -2,15 +2,21 @@
 
 Production source for the `outline-ai-search` service used by the `outline-server` Portainer stack.
 
+The preferred production image is built by GitHub Actions and published to:
+
+```text
+ghcr.io/lebedev-git/outline-ai-search
+```
+
 ## Build
 
-Use the helper from the workspace root:
+Manual fallback build from the workspace root:
 
 ```powershell
 .\scripts\build-outline-ai-search.ps1 -Tag outline-ai-search:2026-05-15
 ```
 
-The script builds the image on the remote Docker endpoint through Portainer.
+The script builds the image on the remote Docker endpoint through Portainer. For normal production releases, use the GitHub Actions workflow in `.github/workflows/build-outline-ai-search.yml`.
 
 ## Runtime
 

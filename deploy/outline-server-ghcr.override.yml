@@ -1,0 +1,5 @@
+services:
+  ai-search:
+    image: ghcr.io/lebedev-git/outline-ai-search:latest
+    environment:
+      FAST_INDEX_INTERVAL_SECONDS: "30"
