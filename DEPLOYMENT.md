@@ -21,13 +21,15 @@ For production, prefer a fixed tag such as `sha-...` or a release tag. `latest` 
 
 ## Portainer Setup
 
-In Portainer, the `ai-search` service should use one of these images:
+In Portainer, the `ai-search` service should use the current verified release image:
 
 ```yaml
-image: ghcr.io/lebedev-git/outline-ai-search:latest
+image: ghcr.io/lebedev-git/outline-ai-search:outline-ai-search-2026-05-15-1
 ```
 
-or a pinned build:
+`latest` is acceptable for quick tests, but a release tag is safer for production because it will not change unexpectedly.
+
+Alternative pinned build format:
 
 ```yaml
 image: ghcr.io/lebedev-git/outline-ai-search:sha-<commit>
